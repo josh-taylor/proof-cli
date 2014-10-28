@@ -9,7 +9,7 @@ By default this tool uses a base template repository located [here](https://gith
 ## Installation
 
 ```
-npm install proof-cli
+npm install -g proof-cli
 ```
 
 ## Usage
