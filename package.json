@@ -1,7 +1,7 @@
 {
   "name": "proof-cli",
   "description": "Command line tool for creating HTML proofs out of images",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "bin": {
     "proof": "./bin/proof",
     "proof-create": "./bin/proof-create"
