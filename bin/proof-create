@@ -1,0 +1,61 @@
+#!/usr/bin/env node
+'use strict';
+
+var fs = require('fs');
+var program = require('commander');
+var sizeOf = require('image-size');
+var request = require('request');
+var handlebars = require('handlebars').compile;
+
+program
+  .option('-t, --template [value]', 'Github path to use as template, defaults to josh-taylor/proof-cli-base-template')
+  .parse(process.argv);
+
+var images = program.args;
+
+// Validate the arguments
+if (!images.length) {
+  console.error('Images are required');
+  process.exit(1);
+}
+
+if (!program.template) {
+  program.template = 'josh-taylor/proof-cli-base-template';
+}
+
+var rawGithubUrl = 'https://raw.githubusercontent.com/';
+
+// Download the stylesheet
+request.get(rawGithubUrl + program.template + '/master/style.css')
+  .pipe(fs.createWriteStream('style.css'));
+
+// Read the template file
+request.get(rawGithubUrl + program.template + '/master/template.hbs', function(error, response, body) {
+  if (!error && response.statusCode == 200) {
+    var template = handlebars(body);
+    var i = 0;
+    var total = images.length;
+
+    // Generate each page
+    images.forEach(function(image) {
+      var filename = 'index.html';
+      if (i !== 0) {
+	filename = i + '.html';
+      }
+
+      var dimensions = sizeOf(image);
+      var data = { 
+	"image-width": dimensions.width, 
+	"image-height": dimensions.height, 
+	"image-path": image,
+	"prev-url": i !== 0 ? (i === 1 ? 'index.html' : (i - 1) + '.html') : (total - 1) + '.html',
+	"next-url": i === total - 1 ? 'index.html' : (i + 1) + '.html'
+      };
+
+      fs.writeFile(filename, template(data));
+
+      ++i;
+    });
+  }
+});
+
