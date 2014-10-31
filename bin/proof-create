@@ -43,13 +43,20 @@ request.get(rawGithubUrl + program.template + '/master/template.hbs', function(e
 	filename = i + '.html';
       }
 
+      var prevUrl = false;
+      var nextUrl = false;
+      if (total > 1) {
+	prevUrl = i !== 0 ? (i === 1 ? 'index.html' : (i - 1) + '.html') : (total - 1) + '.html';
+	nextUrl = i === total - 1 ? 'index.html' : (i + 1) + '.html';
+      }
+
       var dimensions = sizeOf(image);
       var data = { 
 	"image-width": dimensions.width, 
 	"image-height": dimensions.height, 
 	"image-path": image,
-	"prev-url": i !== 0 ? (i === 1 ? 'index.html' : (i - 1) + '.html') : (total - 1) + '.html',
-	"next-url": i === total - 1 ? 'index.html' : (i + 1) + '.html'
+	"prev-url": prevUrl,
+	"next-url": nextUrl
       };
 
       fs.writeFile(filename, template(data));
